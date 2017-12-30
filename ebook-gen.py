@@ -102,8 +102,8 @@ def create_epub (args):
 
 	# Write content.opf
 	replace_template(compiler, os.path.join(oebps_dir, 'content.opf'), {
-		"title": title,
 		"book_id": book_id,
+		"title": title,
 		"contributor": args.contributor,
 		"creator": args.creator,
 		"language": args.language,
@@ -121,6 +121,7 @@ def create_epub (args):
 
 	# Write toc.ncx
 	replace_template(compiler, os.path.join(oebps_dir, 'toc.ncx'), {
+		"book_id": book_id,
 		"title": title,
 		"first_page": numbers[0]['number']
 	})

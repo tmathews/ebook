@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ncx version="2005-1" xml:lang="en-US" xmlns="http://www.daisy.org/z3986/2005/ncx/">
 	<head>
-		<meta name="dtb:uid" content="urn:uuid:b01861e0-0e37-4105-ba6b-d3eb3aeb8fae"/>
+		<meta name="dtb:uid" content="urn:uuid:{{book_id}}"/>
 		<meta name="dtb:depth" content="1"/>
 		<meta name="dtb:totalPageCount" content="0"/>
 		<meta name="dtb:maxPageNumber" content="0"/>

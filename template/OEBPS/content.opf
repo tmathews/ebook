@@ -2,10 +2,14 @@
 <package version="3.0" unique-identifier="BookID" xmlns="http://www.idpf.org/2007/opf">
 	<metadata xmlns:opf="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/">
 		<dc:title>{{title}}</dc:title>
+		<dc:description>{{description}}</dc:description>
 		<dc:language>{{language}}</dc:language>
 		<dc:identifier id="BookID">urn:uuid:{{book_id}}</dc:identifier>
 		<dc:contributor id="contributor">{{contributor}}</dc:contributor>
 		<dc:creator>{{creator}}</dc:creator>
+		{{subjects}}
+		<dc:subject>{{.}}</dc:subject>
+		{{subjects}}
 		<meta property="dcterms:modified">{{date_modified}}</meta>
 		<meta name="cover" content="cover"/>
 		<meta property="rendition:orientation">portrait</meta>

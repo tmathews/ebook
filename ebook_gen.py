@@ -44,6 +44,11 @@ def get_writing_mode (ltr):
 	else:
 		return "horizontal-rl"
 
+def parse_comma_list (xs):
+	if isinstance(xs, str):
+		return list(map(lambda x: x.strip(), xs.split(",")))
+	return xs
+
 def create_epub (args):
 	src_dir = args.dir + os.sep
 
@@ -140,21 +145,73 @@ def create_epub (args):
 	shutil.move(output_path + '.zip', output_path + output_ext)
 	shutil.rmtree(working_dir)
 
+def default_value_parser (x):
+	return x
+
+def input_kv (dic, key, value_parser=default_value_parser):
+	dic[key] = input("    %s (%s): " % (key, dic[key])) or dic[key]
+
+def get_input_metadata (dic):
+	print("Please provide ebook details.\n")
+	input_kv(dic, "uuid")
+	input_kv(dic, "title")
+	input_kv(dic, "date_modified")
+	input_kv(dic, "description")
+	input_kv(dic, "language")
+	input_kv(dic, "contributor")
+	input_kv(dic, "creator")
+	input_kv(dic, "subjects", parse_comma_list)
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Creates an epub from a directory.")
 	parser.add_argument("dir",
 		help="The source directory to read from.")
 	parser.add_argument("--output",
 		help="The desired output file path.")
+	parser.add_argument("--interactive",
+		action="store_true",
+		help="Require input for metadata.")
 	parser.add_argument("--rtl",
 		help="Right to left reading mode.",
 		action="store_false",
 		dest="ltr")
-	parser.add_argument("--uuid")
-	parser.add_argument("--title")
-	parser.add_argument("--language", default="en-US")
-	parser.add_argument("--contributor", default="Unknown Contributor")
-	parser.add_argument("--creator", default="Unknown Author")
-	parser.add_argument("--date-modified")
+	parser.add_argument("--uuid", default="")
+	parser.add_argument("--title", default="")
+	parser.add_argument("--description", default="")
+	parser.add_argument("--language", default="en")
+	parser.add_argument("--contributor", default="")
+	parser.add_argument("--creator", default="")
+	parser.add_argument("--date-modified",
+		help="Current date will be used if not provided.",
+		default="")
+	parser.add_argument("--subjects",
+		nargs="*",
+		help="A comma separated list.",
+		default=[])
 	args = parser.parse_args()
+	if args.interactive:
+		get_input_metadata(vars(args))
+		print("""
+Review new details.
+
+    uuid: %s
+    title: %s
+    modified: %s
+    description: %s
+    language: %s
+    contributor: %s
+    creator: %s
+    subjects: %s
+
+Type "no" to abort.""" % (
+		args.uuid or "(autogen)",
+		args.title or "(use directory name)",
+		args.date_modified or "(now)",
+		args.description,
+		args.language,
+		args.contributor,
+		args.creator,
+		args.subjects))
+		if input() == "no":
+			sys.exit(3)
 	create_epub(args)

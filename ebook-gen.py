@@ -4,6 +4,8 @@ import shutil
 import os
 import sys
 import pybars
+import datetime
+import dateutil.parser
 
 def filter_images (x):
 	_, ext = os.path.splitext(x)
@@ -26,7 +28,22 @@ def replace_template (compiler, path, scope):
 	buf = tmpl(scope)
 	string_to_file(buf, path)
 
-def go (args):
+def get_date (x):
+	date = datetime.datetime.now()
+	if x:
+		date = dateutil.parser.parse(x)
+	xstr = date.isoformat(timespec='seconds').replace('+00:00', 'Z')
+	if xstr[len(xstr) - 1] != 'Z':
+		xstr += 'Z'
+	return xstr
+
+def get_writing_mode (ltr):
+	if ltr:
+		return "horizontal-lr"
+	else:
+		return "horizontal-rl"
+
+def create_epub (args):
 	src_dir = args.dir + os.sep
 
 	if not os.path.exists(src_dir):
@@ -40,9 +57,11 @@ def go (args):
 		return
 
 	compiler = pybars.Compiler()
-	book_id = uuid.uuid1()
+
+	book_id = args.uuid or uuid.uuid1()
 	title = args.title or os.path.basename(os.path.dirname(src_dir))
 	numbers = []
+
 	working_dir = os.path.join('tmp', str(book_id))
 	oebps_dir = os.path.join(working_dir, 'OEBPS')
 	img_dir = os.path.join(oebps_dir, 'Images')
@@ -84,9 +103,13 @@ def go (args):
 	replace_template(compiler, os.path.join(oebps_dir, 'content.opf'), {
 		"title": title,
 		"book_id": book_id,
-		"contributor": "Noone",
-		"date_modified": "",
-		"numbers": numbers
+		"contributor": args.contributor,
+		"creator": args.creator,
+		"language": args.language,
+		"date_modified": get_date(args.date_modified),
+		"writing_mode": get_writing_mode(args.ltr),
+		"direction": 'ltr' if args.ltr else 'rtl',
+		"numbers": numbers,
 	})
 
 	# Write nav.xhtml
@@ -105,19 +128,31 @@ def go (args):
 	output_dir = os.getcwd()
 	if args.output: output_dir = os.path.dirname(args.output)
 	output_name = os.path.basename(args.output or os.path.dirname(src_dir))
+	if not output_name:
+		output_name = os.path.basename(os.path.dirname(src_dir))
 	output_name, output_ext = os.path.splitext(output_name)
-	if output_ext == "":
+	if not output_ext:
 		output_ext = ".epub"
 	output_path = os.path.join(output_dir, output_name)
 	shutil.make_archive(output_path, 'zip', working_dir)
 	shutil.move(output_path + '.zip', output_path + output_ext)
+	shutil.rmtree(working_dir)
 
-parser = argparse.ArgumentParser(description="Creates an epub from a directory.")
-parser.add_argument("dir",
-	help="The source directory to read from.")
-parser.add_argument("--title",
-	help="The desired title. Default will be directory name.")
-parser.add_argument("--output",
-	help="The desired output file path.")
-args = parser.parse_args()
-go(args)
+if __name__ == "__main__":
+	parser = argparse.ArgumentParser(description="Creates an epub from a directory.")
+	parser.add_argument("dir",
+		help="The source directory to read from.")
+	parser.add_argument("--output",
+		help="The desired output file path.")
+	parser.add_argument("--rtl",
+		help="Right to left reading mode.",
+		action="store_false",
+		dest="ltr")
+	parser.add_argument("--uuid")
+	parser.add_argument("--title")
+	parser.add_argument("--language", default="en-US")
+	parser.add_argument("--contributor", default="Unknown Contributor")
+	parser.add_argument("--creator", default="Unknown Author")
+	parser.add_argument("--date-modified")
+	args = parser.parse_args()
+	create_epub(args)

@@ -6,6 +6,7 @@ import sys
 import pybars
 import datetime
 import dateutil.parser
+import tempfile
 
 def filter_images (x):
 	_, ext = os.path.splitext(x)
@@ -62,7 +63,7 @@ def create_epub (args):
 	title = args.title or os.path.basename(os.path.dirname(src_dir))
 	numbers = []
 
-	working_dir = os.path.join('tmp', str(book_id))
+	working_dir = os.path.join(tempfile.gettempdir(), str(book_id))
 	oebps_dir = os.path.join(working_dir, 'OEBPS')
 	img_dir = os.path.join(oebps_dir, 'Images')
 	txt_dir = os.path.join(oebps_dir, 'Text')

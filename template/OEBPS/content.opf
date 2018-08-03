@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package version="3.0" unique-identifier="BookID" xmlns="http://www.idpf.org/2007/opf">
 	<metadata xmlns:opf="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/">
-		<dc:title>{{title}}</dc:title>
-		<dc:description>{{description}}</dc:description>
-		<dc:language>{{language}}</dc:language>
-		<dc:identifier id="BookID">urn:uuid:{{book_id}}</dc:identifier>
-		<dc:contributor id="contributor">{{contributor}}</dc:contributor>
-		<dc:creator>{{creator}}</dc:creator>
-		{{subjects}}
+		<dc:title>{{Title}}</dc:title>
+		<dc:description>{{Description}}</dc:description>
+		<dc:language>{{Language}}</dc:language>
+		<dc:identifier id="BookID">urn:uuid:{{Id}}</dc:identifier>
+		<dc:contributor id="contributor">{{Contributor}}</dc:contributor>
+		<dc:creator>{{Creator}}</dc:creator>
+		{{#Subjects}}
 		<dc:subject>{{.}}</dc:subject>
-		{{subjects}}
-		<meta property="dcterms:modified">{{date_modified}}</meta>
+		{{/Subjects}}
+		<meta property="dcterms:modified">{{DateModifiedStr}}</meta>
 		<meta name="cover" content="cover"/>
 		<meta property="rendition:orientation">portrait</meta>
 		<meta property="rendition:spread">portrait</meta>
 		<meta property="rendition:layout">pre-paginated</meta>
 		<meta name="original-resolution" content="1072x1448"/>
-		<meta name="book-type" content="comic"/>
+		<meta name="book-type" content="{{Type}}"/>
 		<meta name="RegionMagnification" content="true"/>
-		<meta name="primary-writing-mode" content="{{writing_mode}}"/>
-		<meta name="zero-gutter" content="true"/>
-		<meta name="zero-margin" content="true"/>
+		<meta name="primary-writing-mode" content="{{WritingMode}}"/>
+		<meta name="zero-gutter" content="{{ZeroGutter}}"/>
+		<meta name="zero-margin" content="{{ZeroMargin}}"/>
 		<meta name="ke-border-color" content="#ffffff"/>
 		<meta name="ke-border-width" content="0"/>
 	</metadata>
 	<manifest>
 		<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
 		<item id="nav" href="nav.xhtml" properties="nav" media-type="application/xhtml+xml"/>
-		<item id="cover" href="Images/cover.jpg" media-type="image/jpeg" properties="cover-image"/>
-		{{#numbers}}
-		<item id="page_Images_{{number}}" href="Text/{{number}}.xhtml" media-type="application/xhtml+xml"/>
-		<item id="img_Images_{{number}}" href="Images/{{file_name}}" media-type="image/jpeg"/>
-		{{/numbers}}
+		<item id="cover" href="Images/{{Cover.Filename}}" media-type="{{Cover.MimeType}}" properties="cover-image"/>
+		{{#Pages}}
+		<item id="page_Images_{{Number}}" href="Text/{{Number}}.xhtml" media-type="application/xhtml+xml"/>
+		<item id="img_Images_{{Number}}" href="Images/{{Filename}}" media-type="{{MimeType}}"/>
+		{{/Pages}}
 		<item id="css" href="Text/style.css" media-type="text/css"/>
 	</manifest>
-	<spine page-progression-direction="{{direction}}" toc="ncx">
-		{{#numbers}}
-		<itemref idref="page_Images_{{number}}"/>
-		{{/numbers}}
+	<spine page-progression-direction="{{Direction}}" toc="ncx">
+		{{#Pages}}
+		<itemref idref="page_Images_{{Number}}"/>
+		{{/Pages}}
 	</spine>
 </package>

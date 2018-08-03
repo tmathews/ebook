@@ -9,16 +9,15 @@ archive.
 Usage of ./cli/cli:
   -dir string
         Source directory to compile.
-  -kindle
-        Generate to Kindle MOBI format. (Requires kindlegen in your $PATH)
   -meta string
         Apply metadata from a file. (JSON supported)
   -o string
-        Desired filename without the extension.
+        Desired filepath with format. (EPUB, MOBI, CBZ) (MOBI requires kindlegen
+         in your $PATH)
 ```
 
 ## Planned Features
 
- * Create CBZ
+ * CBZ ComicRack Metadata Support
  * EPUB from CBZ
  * Additional Metadata Formats

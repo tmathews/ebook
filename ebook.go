@@ -40,40 +40,62 @@ const (
 type Locale string
 
 const (
-	LocaleEnglish    Locale = "en"
-	LocaleGerman     Locale = "de"
-	LocaleFrench     Locale = "fr"
-	LocaleItalian    Locale = "it"
-	LocaleSpanish    Locale = "es"
 	LocaleChinese    Locale = "zh"
+	LocaleDutch      Locale = "nl"
+	LocaleEnglish    Locale = "en"
+	LocaleFrench     Locale = "fr"
+	LocaleGerman     Locale = "de"
+	LocaleItalian    Locale = "it"
 	LocaleJapanese   Locale = "ja"
 	LocalePortuguese Locale = "pt"
 	LocaleRussian    Locale = "ru"
-	LocaleDutch      Locale = "nl"
+	LocaleSpanish    Locale = "es"
 )
 
-type Book struct {
-	Contributor  string
-	Cover        Page
-	Creator      string
-	DateModified time.Time
-	Direction    Direction
-	Id           string
-	Layout       string
-	Locale       Locale
-	Orientation  Orientation
-	Pages        []Page
-	Spread       string
-	Subjects     []string
-	Title        string
-	Type         BookType
-	WritingMode  WritingMode
-	ZeroGutter   bool
-	ZeroMargin   bool
+var LocaleLanguageMap = map[Locale]string{
+	LocaleChinese:    "Chinese",
+	LocaleDutch:      "Dutch",
+	LocaleEnglish:    "English",
+	LocaleFrench:     "French",
+	LocaleGerman:     "German",
+	LocaleItalian:    "Italian",
+	LocaleJapanese:   "Japanese",
+	LocalePortuguese: "Portuguese",
+	LocaleRussian:    "Russian",
+	LocaleSpanish:    "Spanish",
 }
 
-func (b Book) DateModifiedStr() string {
-	return b.DateModified.Format(time.RFC3339)
+type Book struct {
+	Comments        string
+	Contributor     string
+	Country         string
+	Cover           Page
+	Creator         string
+	Credits         []Credit
+	DateModified    time.Time
+	Direction       Direction
+	Genre           string
+	Id              string
+	IssueCount      int
+	IssueNumber     int
+	Layout          string
+	Locale          Locale
+	Orientation     Orientation
+	Pages           []Page
+	PublicationDate time.Time
+	Publisher       string
+	Rating          int
+	Series          string
+	Spread          string
+	Subjects        []string
+	Tags            []string
+	Title           string
+	Type            BookType
+	VolumeCount     int
+	VolumeNumber    int
+	WritingMode     WritingMode
+	ZeroGutter      bool
+	ZeroMargin      bool
 }
 
 func (b Book) FirstPage() Page {
@@ -83,8 +105,12 @@ func (b Book) FirstPage() Page {
 	return b.Pages[0]
 }
 
-func (b Book) Language() Locale {
-	return b.Locale
+func (b Book) DateModifiedStr() string {
+	return b.DateModified.Format(time.RFC3339)
+}
+
+func (b Book) LanguageStr() string {
+	return LocaleLanguageMap[b.Locale]
 }
 
 func (b *Book) FromJSON(f string) (err error) {
@@ -99,6 +125,12 @@ func (b *Book) FromJSON(f string) (err error) {
 	return nil
 }
 
+type Credit struct {
+	IsPrimary bool
+	Name      string
+	Role      string
+}
+
 type Page struct {
 	Number   string
 	Filename string
@@ -110,10 +142,10 @@ func (p Page) MimeType() string {
 
 func NewBook() Book {
 	return Book{
-		Locale:       LocaleEnglish,
 		DateModified: time.Now(),
 		Direction:    DirectionLeft,
 		Id:           uuid.New().String(),
+		Locale:       LocaleEnglish,
 		Orientation:  OrientationPortrait,
 		Type:         TypeComic,
 		WritingMode:  WritingModeHRL,

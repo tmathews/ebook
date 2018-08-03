@@ -1,5 +1,0 @@
-pkg-resources==0.0.0
-pybars3==0.9.3
-PyMeta3==0.5.1
-python-dateutil==2.6.1
-six==1.11.0

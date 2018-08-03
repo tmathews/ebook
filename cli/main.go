@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 
 	"github.com/tmathews/ebook-gen"
 )
@@ -14,13 +13,11 @@ import (
 func main() {
 	var dir string
 	var out string
-	var kindle bool
 	var meta string
 
 	flag.StringVar(&dir, "dir", "", "Source directory to compile.")
-	flag.StringVar(&out, "o", "", "Desired filename without the extension.")
+	flag.StringVar(&out, "o", "", "Desired filepath with format. (EPUB, MOBI, CBZ) (MOBI requires kindlegen in your $PATH)")
 	flag.StringVar(&meta, "meta", "", "Apply metadata from a file. (JSON supported)")
-	flag.BoolVar(&kindle, "kindle", false, "Generate to Kindle MOBI format. (Requires kindlegen in your $PATH)")
 	flag.Parse()
 
 	book := ebook.NewBook()
@@ -34,23 +31,42 @@ func main() {
 		}
 	}
 
+	ext := filepath.Ext(out)
+	if ext == ".epub" || ext == ".mobi" {
+		GenEpub(book, dir, out, ext == ".mobi")
+	} else if ext == ".cbz" {
+		GenCbz(book, dir, out)
+	} else {
+		fmt.Println("Nothing to do.")
+	}
+}
+
+func GenCbz(book ebook.Book, dir string, out string) {
+	tmpf, err := ebook.CbzFromDir(book, dir)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	err = os.Rename(tmpf, out)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func GenEpub(book ebook.Book, dir string, out string, kindle bool) {
 	tmpf, err := ebook.EPubFromDir(book, dir)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	if out == "" {
-		out = filepath.Join(".", book.Id)
-	}
 	if kindle {
-		err = ToKindle(tmpf, out + ".mobi")
+		err = ToKindle(tmpf, out)
 		os.Remove(tmpf)
 	} else {
-		err = os.Rename(tmpf, out + ".epub")
+		err = os.Rename(tmpf, out)
 	}
 	if err != nil {
 		fmt.Println(err)
-		return
 	}
 }
 
@@ -61,9 +77,5 @@ func ToKindle(in string, out string) error {
 	if err != nil {
 		return err
 	}
-
-	dir := filepath.Dir(in)
-	filename := filepath.Base(in)
-	name := strings.TrimSuffix(filename, filepath.Ext(filename))
-	return os.Rename(filepath.Join(dir, name + ".mobi"), out)
+	return os.Rename(in, out)
 }

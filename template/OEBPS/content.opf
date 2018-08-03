@@ -3,7 +3,7 @@
 	<metadata xmlns:opf="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/">
 		<dc:title>{{Title}}</dc:title>
 		<dc:description>{{Description}}</dc:description>
-		<dc:language>{{Language}}</dc:language>
+		<dc:language>{{Locale}}</dc:language>
 		<dc:identifier id="BookID">urn:uuid:{{Id}}</dc:identifier>
 		<dc:contributor id="contributor">{{Contributor}}</dc:contributor>
 		<dc:creator>{{Creator}}</dc:creator>

@@ -9,8 +9,6 @@ import (
 	"strconv"
 )
 
-type M map[string]interface{}
-
 func GetBookCbzMetadata(book Book) map[string]interface{} {
 	credits := []M{}
 	for _, c := range book.Credits {
@@ -21,7 +19,7 @@ func GetBookCbzMetadata(book Book) map[string]interface{} {
 		})
 	}
 	return M{
-		"appId": "ebook-gen",
+		"appId":        "ebook-gen",
 		"lastModified": book.DateModifiedStr(),
 		"ComicBookInfo/1.0": M{
 			"comments":         book.Comments,

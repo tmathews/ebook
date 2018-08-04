@@ -10,6 +10,8 @@ import (
 	"github.com/google/uuid"
 )
 
+type M map[string]interface{}
+
 type Direction string
 
 const (
@@ -74,6 +76,7 @@ type Book struct {
 	Credits         []Credit
 	DateModified    time.Time
 	Direction       Direction
+	Description     string
 	Genre           string
 	Id              string
 	IssueCount      int

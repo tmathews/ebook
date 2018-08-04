@@ -7,10 +7,26 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"text/template"
 	"time"
-
-	"github.com/aymerick/raymond"
 )
+
+var validExt = []string{
+	".gif",
+	".jpeg",
+	".jpg",
+	".png",
+	".webp",
+}
+
+func IsValidExt(ext string) bool {
+	for _, check := range validExt {
+		if ext == check {
+			return true
+		}
+	}
+	return false
+}
 
 func GetBaseLen(n int) int {
 	s := strconv.Itoa(n)
@@ -29,7 +45,7 @@ func GetFiles(dir string) ([]os.FileInfo, error) {
 		}
 		name := x.Name()
 		ext := filepath.Ext(name)
-		if ext != ".jpeg" && ext != ".png" {
+		if !IsValidExt(ext) {
 			continue
 		}
 		xs = append(xs, x)
@@ -37,12 +53,21 @@ func GetFiles(dir string) ([]os.FileInfo, error) {
 	return xs, nil
 }
 
-func ZipTemplate(a *zip.Writer, tpl *raymond.Template, scope interface{}, f string) error {
-	str, err := tpl.Exec(scope)
+func ZipTemplate(a *zip.Writer, t *template.Template, s interface{}, f string) error {
+	header := zip.FileHeader{
+		Name:     f,
+		Method:   zip.Deflate,
+		Modified: time.Now(),
+	}
+	out, err := a.CreateHeader(&header)
 	if err != nil {
 		return err
 	}
-	return ZipString(a, f, str)
+	err = t.Execute(out, s)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func ZipString(a *zip.Writer, f string, str string) error {
